@@ -14,16 +14,49 @@ module.exports = {
       resolve: `gatsby-source-github-graphql`,
       options: {
         onCreateNode: async (
-          { node, isInternalType, createFileNodeFrom },
+          {
+            node,
+            isInternalType,
+            createContentDigest,
+            createNodeId,
+            actions: { createNode },
+          },
           { pluginNodeTypes }
-        ) => {},
-        createSchemaCustomization: ({ createTypes }, { pluginNodeTypes }) => {},
+        ) => {
+          if (node.internal.type === pluginNodeTypes.DISCUSSION) {
+            const content = node.myOtherFieldAsMarkdown
+
+            await createNode({
+              id: createNodeId(`${node.id} >>> ${content}`),
+              discussionId: node.id,
+              children: [],
+              internal: {
+                type: `MyCustomMarkdownNodeType`,
+                mediaType: `text/markdown`,
+                content,
+                contentDigest: createContentDigest(content),
+              },
+            })
+          }
+        },
+        createSchemaCustomization: (
+          { actions: { createTypes } },
+          { pluginNodeTypes }
+        ) => {
+          const typedefs = `
+            type ${pluginNodeTypes.DISCUSSION} implements Node {
+              myOtherFieldAsMarkdown: MyCustomMarkdownNodeType @link(from: "id", by: "discussionId")
+            }
+          `
+          createTypes(typedefs)
+        },
         createCustomMapper: ({ pluginNodeTypes }) => {
           return {
             [pluginNodeTypes.DISCUSSION]: discussion => {
               return {
                 ...discussion,
                 myCustomField: `Something`,
+                myOtherFieldAsMarkdown: `## Hi\n\nThis is a paragraph.`,
               }
             },
           }

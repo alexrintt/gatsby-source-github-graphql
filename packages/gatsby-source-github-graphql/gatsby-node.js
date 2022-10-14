@@ -194,6 +194,7 @@ exports.onCreateNode = async (...args) => {
       createFileNodeFrom,
       checkIfIsInternalType,
       isInternalType,
+      pluginNodeTypes,
     },
     args.slice(2),
   ];
