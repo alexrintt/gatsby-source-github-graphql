@@ -1,15 +1,15 @@
-const githubOctokit = require(`./github-octokit`)
-const { mergeDeep } = require(`./utils`)
-const { getGithubPlainResolverFields } = require(`./plugin-github-fragments`)
+const githubOctokit = require(`./github-octokit`);
+const { mergeDeep } = require(`./utils`);
+const { getGithubPlainResolverFields } = require(`./plugin-github-fragments`);
 
-const { createRemoteFileNode } = require(`gatsby-source-filesystem`)
+const { createRemoteFileNode } = require(`gatsby-source-filesystem`);
 const {
   getPluginNodeTypes,
   getGithubApiTypes,
-} = require("./github-graphql-defs")
-const { MEDIA_TYPES } = require(`./media-types`)
+} = require("./github-graphql-defs");
+const { MEDIA_TYPES } = require(`./media-types`);
 
-exports.onPreInit = () => {}
+exports.onPreInit = () => {};
 
 exports.sourceNodes = async (...args) => {
   const [
@@ -20,46 +20,46 @@ exports.sourceNodes = async (...args) => {
       getNodesByType,
     },
     userPluginOptions,
-  ] = args
+  ] = args;
 
-  const pluginOptions = userPluginOptions ?? {}
+  const pluginOptions = userPluginOptions ?? {};
 
-  const { token, pluginNodeTypes: userPluginNodeTypes } = pluginOptions
+  const { token, pluginNodeTypes: userPluginNodeTypes } = pluginOptions;
 
-  const rawSubpluginsData = []
+  const rawSubpluginsData = [];
 
-  const githubApiTypes = getGithubApiTypes()
-  const pluginNodeTypes = getPluginNodeTypes(userPluginNodeTypes)
+  const githubApiTypes = getGithubApiTypes();
+  const pluginNodeTypes = getPluginNodeTypes(userPluginNodeTypes);
   const githubPlainResolverFields = getGithubPlainResolverFields({
     pluginNodeTypes,
-  })
+  });
 
   for (const plugin of pluginOptions.plugins ?? []) {
-    const resolvedPlugin = plugin.module
+    const resolvedPlugin = plugin.module;
 
-    plugin.pluginOptions = plugin.pluginOptions ?? {}
+    const subpluginOptions = plugin.pluginOptions ?? {};
 
     // Allow all plugins to have a custom token implicitely.
-    const { token: customToken } = plugin.pluginOptions
+    const { token: customToken } = subpluginOptions;
 
-    delete pluginOptions.token
+    delete pluginOptions.token;
 
-    const graphql = githubOctokit.createGraphQLWithAuth(customToken ?? token)
+    const graphql = githubOctokit.createGraphQLWithAuth(customToken ?? token);
 
     const subpluginArgs = [
       { ...args[0], graphql, githubPlainResolverFields },
       { ...subpluginOptions, githubApiTypes, pluginNodeTypes },
       ...args.slice(2),
-    ]
+    ];
 
-    const pluginData = await resolvedPlugin(...subpluginArgs)
+    const pluginData = await resolvedPlugin(...subpluginArgs);
 
     // Plugins that doesn't return anything probably created
     // the nodes by their own, so just skip it.
-    if (typeof pluginData === `undefined`) continue
+    if (typeof pluginData === `undefined`) continue;
 
     for (const k in pluginData) {
-      pluginData[k] = pluginData[k].map(data => ({
+      pluginData[k] = pluginData[k].map((data) => ({
         ...data,
         // Track each node instance by plugin.
         // This way we can filter the nodes by the source plugin.
@@ -69,30 +69,30 @@ exports.sourceNodes = async (...args) => {
           plugin: plugin.name,
           source: subpluginOptions.source,
         },
-      }))
+      }));
     }
 
     // Otherwise they want we to create the nodes for them.
-    rawSubpluginsData.push(pluginData)
+    rawSubpluginsData.push(pluginData);
   }
 
-  const dataByType = {}
+  const dataByType = {};
 
   for (const pluginData of rawSubpluginsData) {
     for (const k in pluginData) {
-      dataByType[k] = [...(dataByType[k] ?? []), ...(pluginData[k] ?? [])]
+      dataByType[k] = [...(dataByType[k] ?? []), ...(pluginData[k] ?? [])];
     }
   }
 
   if (typeof pluginOptions?.createCustomMapper === `function`) {
-    const customMapper = pluginOptions.createCustomMapper({ pluginNodeTypes })
+    const customMapper = pluginOptions.createCustomMapper({ pluginNodeTypes });
 
     for (const type of Object.values(pluginNodeTypes)) {
-      const mapper = customMapper[type]
+      const mapper = customMapper[type];
 
-      if (typeof mapper !== `function`) continue
+      if (typeof mapper !== `function`) continue;
 
-      dataByType[type] = dataByType[type].map(mapper)
+      dataByType[type] = dataByType[type].map(mapper);
     }
   }
 
@@ -105,17 +105,17 @@ exports.sourceNodes = async (...args) => {
    */
   for (const type in dataByType) {
     // we do not recognize this node type, skip it.
-    if (!Object.values(pluginNodeTypes).includes(type)) continue
+    if (!Object.values(pluginNodeTypes).includes(type)) continue;
 
-    const items = dataByType[type] ?? []
+    const items = dataByType[type] ?? [];
 
     function getMediaType(nodeType) {
       switch (nodeType) {
         case pluginNodeTypes.DISCUSSION:
         case pluginNodeTypes.ISSUE:
-          return MEDIA_TYPES.MARKDOWN
+          return MEDIA_TYPES.MARKDOWN;
         default:
-          return undefined
+          return undefined;
       }
     }
 
@@ -123,16 +123,16 @@ exports.sourceNodes = async (...args) => {
       switch (type) {
         case pluginNodeTypes.DISCUSSION:
         case pluginNodeTypes.ISSUE:
-          return node.body
+          return node.body;
         default:
-          return undefined
+          return undefined;
       }
     }
 
-    const mediaType = getMediaType(type)
+    const mediaType = getMediaType(type);
 
     for (const item of items) {
-      const content = getNodeContent(item, type)
+      const content = getNodeContent(item, type);
 
       await createNode({
         ...item,
@@ -146,10 +146,10 @@ exports.sourceNodes = async (...args) => {
           content: content,
           mediaType: mediaType,
         },
-      })
+      });
     }
   }
-}
+};
 
 exports.onCreateNode = async (...args) => {
   const [
@@ -160,19 +160,19 @@ exports.onCreateNode = async (...args) => {
       getCache,
     },
     pluginOptions,
-  ] = args
+  ] = args;
 
-  const pluginNodeTypes = getPluginNodeTypes(pluginOptions.pluginNodeTypes)
+  const pluginNodeTypes = getPluginNodeTypes(pluginOptions.pluginNodeTypes);
 
-  const internalTypes = [...Object.values(pluginNodeTypes)]
+  const internalTypes = [...Object.values(pluginNodeTypes)];
 
-  const checkIfIsInternalType = type => internalTypes.includes(type)
+  const checkIfIsInternalType = (type) => internalTypes.includes(type);
 
-  const isInternalType = checkIfIsInternalType(node.internal.type)
+  const isInternalType = checkIfIsInternalType(node.internal.type);
 
   async function createFileNodeFrom({ node, key, fieldName } = {}) {
-    if (typeof node[key] !== `string`) return
-    if (!node[key].startsWith(`http`)) return
+    if (typeof node[key] !== `string`) return;
+    if (!node[key].startsWith(`http`)) return;
 
     const fileNode = await createRemoteFileNode({
       url: node[key],
@@ -180,10 +180,10 @@ exports.onCreateNode = async (...args) => {
       createNode,
       createNodeId,
       getCache,
-    })
+    });
 
     if (fileNode) {
-      createNodeField({ node, name: fieldName ?? key, value: fileNode.id })
+      createNodeField({ node, name: fieldName ?? key, value: fileNode.id });
     }
   }
 
@@ -196,28 +196,28 @@ exports.onCreateNode = async (...args) => {
       isInternalType,
     },
     args.slice(2),
-  ]
+  ];
 
   // Allow subplugins make use of `onCreateNode` APIs.
   for (const plugin of pluginOptions.plugins) {
-    const resolvedPlugin = plugin.module
-    const onCreateNode = resolvedPlugin.onCreateNode
+    const resolvedPlugin = plugin.module;
+    const onCreateNode = resolvedPlugin.onCreateNode;
 
     if (typeof onCreateNode === `function`) {
-      onCreateNode(...subpluginArgs)
+      onCreateNode(...subpluginArgs);
     }
   }
 
   // Allow end-users make use of `onCreateNode` APIs.
   if (typeof pluginOptions?.onCreateNode === `function`) {
-    pluginOptions.onCreateNode(...subpluginArgs)
+    pluginOptions.onCreateNode(...subpluginArgs);
   }
 
-  if (!isInternalType) return
+  if (!isInternalType) return;
 
   if (node.internal.type === pluginNodeTypes.USER) {
     if (pluginOptions.generateOptimizedGitHubUserAvatarUrl !== false) {
-      const AVATAR_KEY = `avatarUrl`
+      const AVATAR_KEY = `avatarUrl`;
 
       if (AVATAR_KEY in node) {
         createFileNodeFrom({
@@ -225,7 +225,7 @@ exports.onCreateNode = async (...args) => {
           key: AVATAR_KEY,
           // This is also linked on [createSchemaCustomization] step. See the [pluginNodeTypes.USER] type def.
           fieldName: AVATAR_KEY + `SharpOptimized`,
-        })
+        });
       }
     }
   }
@@ -246,9 +246,9 @@ exports.onCreateNode = async (...args) => {
   //     await createFileNodeFrom({node, key})
   //   }
   // }
-}
+};
 
-exports.createSchemaCustomization = require(`./create-schema-customization`)
+exports.createSchemaCustomization = require(`./create-schema-customization`);
 
 exports.pluginOptionsSchema = function ({ Joi }) {
   return Joi.object({
@@ -264,5 +264,5 @@ exports.pluginOptionsSchema = function ({ Joi }) {
     plugins: Joi.subPlugins().description(
       `A list of subplugins. See also: https://github.com/alexrintt/gatsby-source-github-graphql for examples`
     ),
-  })
-}
+  });
+};
