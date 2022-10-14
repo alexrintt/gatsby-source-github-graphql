@@ -42,7 +42,7 @@ exports.sourceNodes = async (...args) => {
     // Allow all plugins to have a custom token implicitely.
     const { token: customToken } = subpluginOptions;
 
-    delete pluginOptions.token;
+    delete subpluginOptions.token;
 
     const graphql = githubOctokit.createGraphQLWithAuth(customToken ?? token);
 
