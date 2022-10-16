@@ -9,6 +9,12 @@ const {
 } = require("./github-graphql-defs");
 const { MEDIA_TYPES } = require(`./media-types`);
 
+function getPluginOptionsWithoutToken(options) {
+  const rawOptions = options ?? {};
+  delete rawOptions.token;
+  return rawOptions;
+}
+
 exports.onPreInit = () => {};
 
 exports.sourceNodes = async (...args) => {
@@ -39,7 +45,7 @@ exports.sourceNodes = async (...args) => {
 
     const subpluginOptions = plugin.pluginOptions ?? {};
 
-    // Allow all plugins to have a custom token implicitely.
+    // Allow all plugins to have a custom token implicitly.
     const { token: customToken } = subpluginOptions;
 
     delete subpluginOptions.token;
@@ -187,22 +193,24 @@ exports.onCreateNode = async (...args) => {
     }
   }
 
-  const subpluginArgs = [
-    args[0],
-    {
-      ...args[1],
-      createFileNodeFrom,
-      checkIfIsInternalType,
-      isInternalType,
-      pluginNodeTypes,
-    },
-    args.slice(2),
-  ];
-
   // Allow subplugins make use of `onCreateNode` APIs.
   for (const plugin of pluginOptions.plugins) {
     const resolvedPlugin = plugin.module;
     const onCreateNode = resolvedPlugin.onCreateNode;
+
+    const subpluginOptions = getPluginOptionsWithoutToken(plugin.pluginOptions);
+
+    const subpluginArgs = [
+      args[0],
+      {
+        ...subpluginOptions,
+        createFileNodeFrom,
+        checkIfIsInternalType,
+        isInternalType,
+        pluginNodeTypes,
+      },
+      args.slice(2),
+    ];
 
     if (typeof onCreateNode === `function`) {
       onCreateNode(...subpluginArgs);
@@ -211,7 +219,9 @@ exports.onCreateNode = async (...args) => {
 
   // Allow end-users make use of `onCreateNode` APIs.
   if (typeof pluginOptions?.onCreateNode === `function`) {
-    pluginOptions.onCreateNode(...subpluginArgs);
+    pluginOptions.onCreateNode(
+      ...[args[0], { ...getPluginOptionsWithoutToken(args[1]) }, args.slice(2)]
+    );
   }
 
   if (!isInternalType) return;
