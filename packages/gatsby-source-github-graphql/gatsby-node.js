@@ -10,7 +10,7 @@ const {
 const { MEDIA_TYPES } = require(`./media-types`);
 
 function getPluginOptionsWithoutToken(options) {
-  const rawOptions = options ?? {};
+  const rawOptions = { ...options } ?? {};
   delete rawOptions.token;
   return rawOptions;
 }
@@ -43,18 +43,22 @@ exports.sourceNodes = async (...args) => {
   for (const plugin of pluginOptions.plugins ?? []) {
     const resolvedPlugin = plugin.module;
 
-    const subpluginOptions = plugin.pluginOptions ?? {};
+    const subpluginOptions = { ...(plugin.pluginOptions ?? {}) };
+
+    delete subpluginOptions.token;
 
     // Allow all plugins to have a custom token implicitly.
     const { token: customToken } = subpluginOptions;
-
-    delete subpluginOptions.token;
 
     const graphql = githubOctokit.createGraphQLWithAuth(customToken ?? token);
 
     const subpluginArgs = [
       { ...args[0], graphql, githubPlainResolverFields },
-      { ...subpluginOptions, githubApiTypes, pluginNodeTypes },
+      {
+        ...{ ...subpluginOptions, token: undefined },
+        githubApiTypes,
+        pluginNodeTypes,
+      },
       ...args.slice(2),
     ];
 
@@ -209,7 +213,7 @@ exports.onCreateNode = async (...args) => {
         isInternalType,
         pluginNodeTypes,
       },
-      args.slice(2),
+      ...args.slice(2),
     ];
 
     if (typeof onCreateNode === `function`) {
@@ -220,7 +224,17 @@ exports.onCreateNode = async (...args) => {
   // Allow end-users make use of `onCreateNode` APIs.
   if (typeof pluginOptions?.onCreateNode === `function`) {
     pluginOptions.onCreateNode(
-      ...[args[0], { ...getPluginOptionsWithoutToken(args[1]) }, args.slice(2)]
+      ...[
+        args[0],
+        {
+          ...getPluginOptionsWithoutToken(args[1]),
+          createFileNodeFrom,
+          checkIfIsInternalType,
+          isInternalType,
+          pluginNodeTypes,
+        },
+        ...args.slice(2),
+      ]
     );
   }
 
