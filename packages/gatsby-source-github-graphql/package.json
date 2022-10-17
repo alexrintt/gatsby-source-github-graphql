@@ -1,7 +1,7 @@
 {
   "name": "gatsby-source-github-graphql",
   "description": "A simple starter to get up and developing quickly with Gatsby",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
     "@octokit/graphql": "^5.0.1"
   },
