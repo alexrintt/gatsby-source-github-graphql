@@ -240,19 +240,43 @@ exports.onCreateNode = async (...args) => {
 
   if (!isInternalType) return;
 
-  if (node.internal.type === pluginNodeTypes.USER) {
-    if (pluginOptions.generateOptimizedGitHubUserAvatarUrl !== false) {
-      const AVATAR_KEY = `avatarUrl`;
+  async function handleImageOptimizationForNode({
+    node,
+    targetNodeType,
+    key,
+    optionableKey,
+  }) {
+    const IMAGE_OPTIMIZATION_KEY_SUFFIX = `SharpOptimized`;
 
-      if (AVATAR_KEY in node) {
-        createFileNodeFrom({
+    if (node.internal.type !== targetNodeType) return;
+
+    if (pluginOptions[optionableKey] !== false) {
+      if (key in node) {
+        await createFileNodeFrom({
           node,
-          key: AVATAR_KEY,
+          key: key,
           // This is also linked on [createSchemaCustomization] step. See the [pluginNodeTypes.USER] type def.
-          fieldName: AVATAR_KEY + `SharpOptimized`,
+          fieldName: key + IMAGE_OPTIMIZATION_KEY_SUFFIX,
         });
       }
     }
+  }
+
+  const targetOptimizationOptions = [
+    {
+      targetNodeType: pluginNodeTypes.USER,
+      key: `avatarUrl`,
+      optionableKey: `generateOptimizedGitHubUserAvatarUrl`,
+    },
+    {
+      targetNodeType: pluginNodeTypes.REPOSITORY,
+      key: `openGraphImageUrl`,
+      optionableKey: `generateOptimizedGitHubRepositoryOpenGraphImageUrl`,
+    },
+  ];
+
+  for (const options of targetOptimizationOptions) {
+    await handleImageOptimizationForNode({ ...options, node });
   }
 
   // for (const key in node) {
@@ -286,6 +310,10 @@ exports.pluginOptionsSchema = function ({ Joi }) {
     generateOptimizedGitHubUserAvatarUrl: Joi.boolean().description(
       `Wether or not should generate the optimized version of the GitHub user [avatarUrl] field. Set to [false] if you do not want to. Defaults to [true].`
     ),
+    generateOptimizedGitHubRepositoryOpenGraphImageUrl:
+      Joi.boolean().description(
+        `Wether or not should generate the optimized version of the GitHub repository [openGraphImageUrl] field. Set to [false] if you do not want to. Defaults to [true].`
+      ),
     plugins: Joi.subPlugins().description(
       `A list of subplugins. See also: https://github.com/alexrintt/gatsby-source-github-graphql for examples`
     ),

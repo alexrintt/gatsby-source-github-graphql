@@ -6334,6 +6334,27 @@
   "resolved" "https://registry.npmjs.org/events/-/events-3.3.0.tgz"
   "version" "3.3.0"
 
+"example-using-gatsby-source-github-graphql@file:F:\\Desktop\\starter\\packages\\example-using-gatsby-source-github-graphql":
+  "resolved" "file:packages/example-using-gatsby-source-github-graphql"
+  "version" "0.1.0"
+  dependencies:
+    "dotenv" "^16.0.3"
+    "gatsby" "^4.24.3"
+    "gatsby-plugin-image" "^2.24.0"
+    "gatsby-plugin-manifest" "^4.24.0"
+    "gatsby-plugin-sharp" "^4.24.0"
+    "gatsby-remark-images-remote" "^2.1.1"
+    "gatsby-source-filesystem" "^4.24.0"
+    "gatsby-source-github-graphql" "*"
+    "gatsby-source-github-graphql-discussions" "*"
+    "gatsby-source-github-graphql-sponsors" "*"
+    "gatsby-source-github-graphql-user-repos" "*"
+    "gatsby-transformer-remark" "^5.24.0"
+    "gatsby-transformer-sharp" "^4.24.0"
+    "prop-types" "^15.8.1"
+    "react" "^18.1.0"
+    "react-dom" "^18.1.0"
+
 "execa@^1.0.0":
   "integrity" "sha512-adbxcyWV46qiHyvSp50TKt05tB4tK3HcmF7/nxfAdhnox83seTDbwnaqKO4sXRy7roHAIFqJP/Rw/AuEbX61LA=="
   "resolved" "https://registry.npmjs.org/execa/-/execa-1.0.0.tgz"
@@ -7095,31 +7116,15 @@
   "resolved" "file:packages/gatsby-source-github-graphql-sponsors"
   "version" "0.1.0"
 
+"gatsby-source-github-graphql-user-repos@*", "gatsby-source-github-graphql-user-repos@file:F:\\Desktop\\starter\\packages\\gatsby-source-github-graphql-user-repos":
+  "resolved" "file:packages/gatsby-source-github-graphql-user-repos"
+  "version" "0.1.0"
+
 "gatsby-source-github-graphql@*", "gatsby-source-github-graphql@file:F:\\Desktop\\starter\\packages\\gatsby-source-github-graphql":
   "resolved" "file:packages/gatsby-source-github-graphql"
   "version" "0.1.0"
   dependencies:
     "@octokit/graphql" "^5.0.1"
-
-"gatsby-starter-default@file:F:\\Desktop\\starter\\packages\\example-using-gatsby-source-github-graphql":
-  "resolved" "file:packages/example-using-gatsby-source-github-graphql"
-  "version" "0.1.0"
-  dependencies:
-    "dotenv" "^16.0.3"
-    "gatsby" "^4.24.3"
-    "gatsby-plugin-image" "^2.24.0"
-    "gatsby-plugin-manifest" "^4.24.0"
-    "gatsby-plugin-sharp" "^4.24.0"
-    "gatsby-remark-images-remote" "^2.1.1"
-    "gatsby-source-filesystem" "^4.24.0"
-    "gatsby-source-github-graphql" "*"
-    "gatsby-source-github-graphql-discussions" "*"
-    "gatsby-source-github-graphql-sponsors" "*"
-    "gatsby-transformer-remark" "^5.24.0"
-    "gatsby-transformer-sharp" "^4.24.0"
-    "prop-types" "^15.8.1"
-    "react" "^18.1.0"
-    "react-dom" "^18.1.0"
 
 "gatsby-telemetry@^3.24.0":
   "integrity" "sha512-ioBzkmImRuyEAGtnyJgpln4LKTQ61MAjFaU+SFLVKDATcVh86rfNbD2ks5DzZgCtsP1/zVmHv2a7s4z/TQCZjA=="

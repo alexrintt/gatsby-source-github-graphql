@@ -79,6 +79,33 @@ module.exports = {
               login: `kotx`,
             },
           },
+          {
+            // Plugin to fetch all repositories of a given user [login].
+            resolve: `gatsby-source-github-graphql-user-repos`,
+            options: {
+              // Limit to 3 repositories to avoid 429 error (too many requests).
+              // If you have a development environment: limit: process.env.NODE_ENV === "development" ? 3 : undefined,
+              limit: 3,
+
+              // Target user account.
+              login: `alexrintt`,
+
+              // Wether or not should fetch only locked repos, remove or set to [null] to omit this filter.
+              isLocked: false,
+
+              // [null] means both, private and public (will include private if you are authenticated as this user).
+              privacy: `PUBLIC`,
+
+              // Wether should fetch only forks or not, remove or set to [null] to omit this filter.
+              isFork: false,
+
+              // Viewer affiliations
+              affiliations: [`OWNER`, `COLLABORATOR`],
+
+              // [login] user affiliation, same effect if you are logged as user A and is fetching the repositories of the same user A.
+              ownerAffiliations: [`OWNER`, `COLLABORATOR`],
+            },
+          },
         ],
       },
     },

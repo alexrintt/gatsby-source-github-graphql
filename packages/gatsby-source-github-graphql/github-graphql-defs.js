@@ -1,10 +1,13 @@
-const { mergeDeep } = require(`./utils`)
-
-exports.OrderDirection = Object.freeze({})
+const { mergeDeep } = require(`./utils`);
 
 // Mirrored from GitHub GraphQL API types.
 const DEFAULT_PLUGIN_GITHUB_NODE_TYPES = Object.freeze({
   DISCUSSION: `GitHubDiscussion`,
+  REPOSITORY: `GitHubRepository`,
+  REPOSITORY_TOPIC: `GitHubRepositoryTopic`,
+  LANGUAGE: `GitHubLanguage`,
+  REPOSITORY_OWNER: `GitHubRepositoryOwner`,
+  TOPIC: `GitHubTopic`,
   LABEL: `GitHubLabel`,
   DISCUSSION_CATEGORY: `GitHubDiscussionCategory`,
   USER: `GitHubUser`,
@@ -13,9 +16,9 @@ const DEFAULT_PLUGIN_GITHUB_NODE_TYPES = Object.freeze({
   MANNEQUIN: `GitHubMannequin`,
   ORGANIZATION: `GitHubOrganization`,
   ISSUE: `GitHubIssue`,
-})
+});
 
-exports.DEFAULT_PLUGIN_GITHUB_NODE_TYPES = DEFAULT_PLUGIN_GITHUB_NODE_TYPES
+exports.DEFAULT_PLUGIN_GITHUB_NODE_TYPES = DEFAULT_PLUGIN_GITHUB_NODE_TYPES;
 
 const DEFAULT_GITHUB_API_TYPES = Object.freeze({
   USER: `User`,
@@ -28,14 +31,14 @@ const DEFAULT_GITHUB_API_TYPES = Object.freeze({
     ASC: `ASC`,
     DESC: `DESC`,
   },
-})
+});
 
-exports.DEFAULT_GITHUB_API_TYPES = DEFAULT_GITHUB_API_TYPES
+exports.DEFAULT_GITHUB_API_TYPES = DEFAULT_GITHUB_API_TYPES;
 
 exports.getPluginNodeTypes = function (override) {
-  return mergeDeep(DEFAULT_PLUGIN_GITHUB_NODE_TYPES, override ?? {})
-}
+  return mergeDeep(DEFAULT_PLUGIN_GITHUB_NODE_TYPES, override ?? {});
+};
 
 exports.getGithubApiTypes = function getNodeTypes(override) {
-  return mergeDeep(DEFAULT_GITHUB_API_TYPES, override ?? {})
-}
+  return mergeDeep(DEFAULT_GITHUB_API_TYPES, override ?? {});
+};

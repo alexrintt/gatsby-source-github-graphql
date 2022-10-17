@@ -19,6 +19,9 @@ module.exports = async (gatsbyNodeApis, pluginOptions) => {
       type ${pluginNodeTypes.USER} implements Node {
         avatarUrlSharpOptimized: File @link(from: "fields.avatarUrlSharpOptimized")
       }
+      type ${pluginNodeTypes.REPOSITORY} implements Node {
+        openGraphImageUrlSharpOptimized: File @link(from: "fields.openGraphImageUrlSharpOptimized")
+      }
     `;
     createTypes(userTypeDef);
   }
