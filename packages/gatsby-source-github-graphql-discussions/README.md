@@ -28,9 +28,9 @@ In your `gatsby-config.js`:
           categorySlugs: [`Published`],
 
           // You can use this key to filter any resource.
-          // So you can use multiple instances of this plugin, keep the relationships
-          // and filter then.
-          instance: `Post`
+          // So you can use multiple instances of this plugin, 
+          // keep the relationships and filter then.
+          source: `Post`
         }
       }
     ]
