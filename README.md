@@ -4,7 +4,7 @@
 - It does **NOT** CMS Preview (not tested at least).
 - It does **SUPPORT** image optimizations.
 - It does **NOT** support gif optimizations, [simply because Gatsby does not](https://github.com/gatsbyjs/gatsby/issues/23678).
-- It **PARTIALLY SUPPORT** support the GraphQL data layer, if you use-case is not supported yet, feel free to check [how to create a subplugin](#how-to-create-a-subplugin).
+- It **PARTIALLY SUPPORTS** the GraphQL Data Layer, if you use-case is not supported yet, feel free to check [how to create a subplugin](#how-to-create-a-subplugin).
 
 ## Usage
 
