@@ -180,7 +180,7 @@ module.exports.sourceNodes = async (gatsbyNodeApis, pluginOptions) => {
   };
 }
 
-// The user avatarURL is optimized by default in the core plugin since it's a intrinc use-case and it's available under the 'avatarUrlSharpOptimized' key.
+// The user avatarURL is optimized by default in the core plugin since it's a intrinsic use-case and it's available under the 'avatarUrlSharpOptimized' key.
 // But just for 'fun' lets create a custom key in the user node type to store a second optimized image URL (just for example purposes).
 module.exports.onCreateNode = ({ node, githubSourcePlugin }, pluginOptions) => {
   // [createFileNodeFrom] is new here and it's available only inside of [onCreateNode] function.
@@ -206,7 +206,7 @@ module.exports.createSchemaCustomization = ({ actions: { createTypes }, githubSo
   const { pluginNodeTypes } = githubSourcePlugin;
 
   // Now lets define that the User type will have the key 
-  // [myOptimizedAvatar] that should be linked from the previously created [field] 'optimizedAvatarField'.
+  // [optimizedAvatar] that should be linked from the previously created field [optimizedAvatarField].
   const userWithOptimizedAvatarTypeDef = `
     type ${pluginNodeTypes.USER} implements Node {
       optimizedAvatar: File @link(from: "fields.optimizedAvatarField")
