@@ -190,11 +190,11 @@ async function getAllReposOfUser({
   };
 }
 
-module.exports = async (
-  { graphql, githubPlainResolverFields },
-  pluginOptions
-) => {
+module.exports.sourceNodes = async ({ githubSourcePlugin }, pluginOptions) => {
   pluginOptions = pluginOptions ?? {};
+
+  const { graphql, githubPlainResolverFields, pluginNodeTypes } =
+    githubSourcePlugin;
 
   const {
     login,
@@ -203,7 +203,6 @@ module.exports = async (
     privacy: customPrivacy,
     isLocked: customIsLocked,
     isFork: customIsFork,
-    pluginNodeTypes,
     limit,
   } = pluginOptions;
 
@@ -240,11 +239,14 @@ module.exports = async (
 };
 
 module.exports.createSchemaCustomization = (
-  { actions: { createTypes } },
+  {
+    actions: {
+      createTypes,
+      githubSourcePlugin: { pluginNodeTypes },
+    },
+  },
   pluginOptions
 ) => {
-  const { pluginNodeTypes } = pluginOptions;
-
   const typedefs = `
     type ${pluginNodeTypes.USER} implements Node {
       repositories: [${pluginNodeTypes.REPOSITORY}] @link(by: "owner.login", from: "login")

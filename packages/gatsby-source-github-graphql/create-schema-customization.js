@@ -1,6 +1,9 @@
 const { getPluginNodeTypes } = require(`./github-graphql-defs`);
+const { removeKey } = require("./utils");
 
-module.exports = async (gatsbyNodeApis, pluginOptions) => {
+module.exports = async (...args) => {
+  const [gatsbyNodeApis, pluginOptions] = args;
+
   const pluginNodeTypes = getPluginNodeTypes(pluginOptions.pluginNodeTypes);
 
   const createTypes = gatsbyNodeApis.actions.createTypes;
@@ -32,14 +35,15 @@ module.exports = async (gatsbyNodeApis, pluginOptions) => {
   for (const plugin of plugins) {
     const resolvedPlugin = plugin.module;
 
-    const createSchemaCustomization = resolvedPlugin.createSchemaCustomization;
-
-    if (typeof createSchemaCustomization === `function`) {
-      createSchemaCustomization(gatsbyNodeApis, {
-        ...plugin.pluginOptions,
-        pluginNodeTypes,
-      });
-    }
+    resolvedPlugin?.createSchemaCustomization?.(
+      {
+        ...args[0],
+        githubSourcePlugin,
+      },
+      {
+        ...removeKey(plugin.pluginOptions, `token`),
+      }
+    );
   }
 
   // allow end-users (developers) create schema customizations

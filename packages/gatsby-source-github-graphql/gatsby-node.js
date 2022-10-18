@@ -9,12 +9,6 @@ const {
 } = require("./github-graphql-defs");
 const { MEDIA_TYPES } = require(`./media-types`);
 
-function getPluginOptionsWithoutToken(options) {
-  const rawOptions = { ...options } ?? {};
-  delete rawOptions.token;
-  return rawOptions;
-}
-
 exports.onPreInit = () => {};
 
 exports.sourceNodes = async (...args) => {
@@ -45,24 +39,27 @@ exports.sourceNodes = async (...args) => {
 
     const subpluginOptions = { ...(plugin.pluginOptions ?? {}) };
 
-    delete subpluginOptions.token;
-
     // Allow all plugins to have a custom token implicitly.
     const { token: customToken } = subpluginOptions;
 
     const graphql = githubOctokit.createGraphQLWithAuth(customToken ?? token);
 
+    const githubSourcePlugin = {
+      graphql,
+      githubPlainResolverFields,
+      githubApiTypes,
+      pluginNodeTypes,
+    };
+
     const subpluginArgs = [
-      { ...args[0], graphql, githubPlainResolverFields },
+      { ...args[0], githubSourcePlugin },
       {
-        ...{ ...subpluginOptions, token: undefined },
-        githubApiTypes,
-        pluginNodeTypes,
+        ...removeKey(subpluginOptions, `token`),
       },
       ...args.slice(2),
     ];
 
-    const pluginData = await resolvedPlugin(...subpluginArgs);
+    const pluginData = await resolvedPlugin?.sourceNodes?.(...subpluginArgs);
 
     // Plugins that doesn't return anything probably created
     // the nodes by their own, so just skip it.
@@ -202,16 +199,19 @@ exports.onCreateNode = async (...args) => {
     const resolvedPlugin = plugin.module;
     const onCreateNode = resolvedPlugin.onCreateNode;
 
-    const subpluginOptions = getPluginOptionsWithoutToken(plugin.pluginOptions);
+    const subpluginOptions = plugin.pluginOptions;
+
+    const githubSourcePlugin = {
+      createFileNodeFrom,
+      checkIfIsInternalType,
+      isInternalType,
+      pluginNodeTypes,
+    };
 
     const subpluginArgs = [
-      args[0],
+      { ...args[0], githubSourcePlugin },
       {
-        ...subpluginOptions,
-        createFileNodeFrom,
-        checkIfIsInternalType,
-        isInternalType,
-        pluginNodeTypes,
+        ...getPluginOptionsWithoutToken(subpluginOptions),
       },
       ...args.slice(2),
     ];

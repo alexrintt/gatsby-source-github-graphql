@@ -3,7 +3,7 @@ exports.pluginOptionsSchema = function ({ Joi }) {
     owner: Joi.string()
       .required()
       .description(
-        `The target user account. Used to fetch the discussions from GraphQL API. Combine this option with [repo] option`
+        `The target user account. Use it to fetch the discussions from GraphQL API. Combine this option with [repo] option.`
       ),
     repo: Joi.string()
       .required()
@@ -17,5 +17,5 @@ exports.pluginOptionsSchema = function ({ Joi }) {
     orderByField: Joi.string(),
     categoryIds: Joi.array().items(Joi.string()),
     categorySlugs: Joi.array().items(Joi.string()),
-  })
-}
+  });
+};

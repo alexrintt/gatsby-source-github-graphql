@@ -5,7 +5,7 @@ exports.getGithubPlainResolverFields = ({ pluginNodeTypes }) => {
     resourcePath
     url
     typename: __typename
-  `
+  `;
 
   const fragments = {
     [pluginNodeTypes.USER]: `
@@ -78,13 +78,15 @@ exports.getGithubPlainResolverFields = ({ pluginNodeTypes }) => {
       color
       url
     `,
-  }
+  };
 
   // Allow usage as pluginFragments.DISCUSSION, pluginFragments.USER, etc.
-  return Object.keys(pluginNodeTypes).reduce((previous, current) => {
-    return {
-      ...previous,
-      [current]: fragments[pluginNodeTypes[current]],
-    }
-  }, {})
-}
+  return Object.freeze(
+    Object.keys(pluginNodeTypes).reduce((previous, current) => {
+      return {
+        ...previous,
+        [current]: fragments[pluginNodeTypes[current]],
+      };
+    }, {})
+  );
+};

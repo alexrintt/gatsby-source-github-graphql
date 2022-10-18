@@ -7,12 +7,12 @@ async function fetchUserSponsorNetwork({
     data: [],
     cursor: null,
     hasNextPage: true,
-  }
+  };
   const sponsoringContext = {
     data: [],
     cursor: null,
     hasNextPage: true,
-  }
+  };
 
   while (true) {
     const {
@@ -71,28 +71,35 @@ async function fetchUserSponsorNetwork({
           : null,
         sponsoringCount: sponsoringContext.hasNextPage ? 100 : 0,
       }
-    )
+    );
 
-    sponsorsContext.data.push(...sponsors.nodes)
-    sponsoringContext.data.push(...sponsoring.nodes)
+    sponsorsContext.data.push(...sponsors.nodes);
+    sponsoringContext.data.push(...sponsoring.nodes);
 
-    sponsorsContext.hasNextPage = sponsors.pageInfo.hasNextPage
-    sponsoringContext.hasNextPage = sponsoring.pageInfo.hasNextPage
+    sponsorsContext.hasNextPage = sponsors.pageInfo.hasNextPage;
+    sponsoringContext.hasNextPage = sponsoring.pageInfo.hasNextPage;
 
-    if (!sponsorsContext.hasNextPage && !sponsoringContext.hasNextPage) break
+    if (!sponsorsContext.hasNextPage && !sponsoringContext.hasNextPage) break;
   }
 
   return {
     sponsors: sponsorsContext.data,
     sponsoring: sponsoringContext.data,
-  }
+  };
 }
 
-module.exports = async (
-  { graphql, githubPlainResolverFields },
+module.exports.sourceNodes = async (
+  {
+    githubSourcePlugin: {
+      graphql,
+      githubPlainResolverFields,
+      pluginNodeTypes,
+      login,
+    },
+  },
   pluginOptions
 ) => {
-  const { pluginNodeTypes, login } = pluginOptions
+  const { login } = pluginOptions;
 
   const { user } = await graphql(
     `
@@ -105,13 +112,13 @@ module.exports = async (
     {
       login,
     }
-  )
+  );
 
   const { sponsors, sponsoring } = await fetchUserSponsorNetwork({
     graphql,
     login,
     githubPlainResolverFields,
-  })
+  });
 
   return {
     [pluginNodeTypes.USER]: [
@@ -119,27 +126,30 @@ module.exports = async (
       ...sponsors,
       ...sponsoring,
     ],
-  }
-}
+  };
+};
 
 module.exports.onCreateNode = async (
-  { node, isInternalType, createFileNodeFrom },
-  { pluginNodeTypes }
+  {
+    node,
+    githubSourcePlugin: { isInternalType, createFileNodeFrom, pluginNodeTypes },
+  },
+  pluginOptions
 ) => {
-  if (!isInternalType) return
-}
+  if (!isInternalType) return;
+};
 
 module.exports.createSchemaCustomization = (
-  { actions },
-  { pluginNodeTypes }
+  { actions, githubSourcePlugin: { pluginNodeTypes } },
+  pluginOptions
 ) => {
-  const { createTypes } = actions
+  const { createTypes } = actions;
 
   const typeDefs = `
     type ${pluginNodeTypes.USER} implements Node {
       sponsors: [${pluginNodeTypes.USER}] @link(by: "githubId", from: "sponsors.id")
       sponsoring: [${pluginNodeTypes.USER}] @link(by: "githubId", from: "sponsoring.id")
     }
-  `
-  createTypes(typeDefs)
-}
+  `;
+  createTypes(typeDefs);
+};
