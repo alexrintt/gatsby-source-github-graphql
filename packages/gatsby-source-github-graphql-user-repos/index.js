@@ -239,12 +239,7 @@ module.exports.sourceNodes = async ({ githubSourcePlugin }, pluginOptions) => {
 };
 
 module.exports.createSchemaCustomization = (
-  {
-    actions: {
-      createTypes,
-      githubSourcePlugin: { pluginNodeTypes },
-    },
-  },
+  { actions: { createTypes }, githubSourcePlugin: { pluginNodeTypes } },
   pluginOptions
 ) => {
   const typedefs = `

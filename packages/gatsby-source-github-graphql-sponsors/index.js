@@ -90,12 +90,7 @@ async function fetchUserSponsorNetwork({
 
 module.exports.sourceNodes = async (
   {
-    githubSourcePlugin: {
-      graphql,
-      githubPlainResolverFields,
-      pluginNodeTypes,
-      login,
-    },
+    githubSourcePlugin: { graphql, githubPlainResolverFields, pluginNodeTypes },
   },
   pluginOptions
 ) => {

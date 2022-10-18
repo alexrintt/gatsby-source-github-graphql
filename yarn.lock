@@ -6347,6 +6347,7 @@
     "gatsby-source-filesystem" "^4.24.0"
     "gatsby-source-github-graphql" "*"
     "gatsby-source-github-graphql-discussions" "*"
+    "gatsby-source-github-graphql-get-user" "*"
     "gatsby-source-github-graphql-sponsors" "*"
     "gatsby-source-github-graphql-user-repos" "*"
     "gatsby-transformer-remark" "^5.24.0"
@@ -7112,6 +7113,10 @@
   "resolved" "file:packages/gatsby-source-github-graphql-discussions"
   "version" "0.1.0"
 
+"gatsby-source-github-graphql-get-user@*", "gatsby-source-github-graphql-get-user@file:F:\\Desktop\\starter\\packages\\gatsby-source-github-graphql-get-user":
+  "resolved" "file:packages/gatsby-source-github-graphql-get-user"
+  "version" "0.1.0"
+
 "gatsby-source-github-graphql-sponsors@*", "gatsby-source-github-graphql-sponsors@file:F:\\Desktop\\starter\\packages\\gatsby-source-github-graphql-sponsors":
   "resolved" "file:packages/gatsby-source-github-graphql-sponsors"
   "version" "0.1.0"
@@ -7122,7 +7127,7 @@
 
 "gatsby-source-github-graphql@*", "gatsby-source-github-graphql@file:F:\\Desktop\\starter\\packages\\gatsby-source-github-graphql":
   "resolved" "file:packages/gatsby-source-github-graphql"
-  "version" "0.1.0"
+  "version" "0.1.1"
   dependencies:
     "@octokit/graphql" "^5.0.1"
 

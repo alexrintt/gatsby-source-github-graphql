@@ -20,7 +20,8 @@
     "gatsby-source-github-graphql": "*",
     "gatsby-source-github-graphql-discussions": "*",
     "gatsby-source-github-graphql-sponsors": "*",
-    "gatsby-source-github-graphql-user-repos": "*"
+    "gatsby-source-github-graphql-user-repos": "*",
+    "gatsby-source-github-graphql-get-user": "*"
   },
   "devDependencies": {
     "prettier": "^2.7.1"
@@ -28,8 +29,9 @@
   "keywords": [
     "gatsby"
   ],
-  "license": "0BSD",
+  "license": "MIT",
   "scripts": {
+    "postinstall": "lerna bootstrap",
     "build": "npm run clean && gatsby build",
     "develop": "npm run clean && gatsby develop",
     "dev": "npm run clean && gatsby develop",

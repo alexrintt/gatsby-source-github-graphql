@@ -1,4 +1,4 @@
-const MAX_RESULTS = 100
+const MAX_RESULTS = 100;
 
 async function listDiscussionsOfRepo(
   owner,
@@ -68,10 +68,10 @@ async function listDiscussionsOfRepo(
         direction: orderByDirection,
       },
     }
-  )
-  return data
+  );
+  return data;
 }
-exports.listDiscussionsOfRepo = listDiscussionsOfRepo
+exports.listDiscussionsOfRepo = listDiscussionsOfRepo;
 
 async function fetchDiscussions(
   owner,
@@ -86,7 +86,7 @@ async function fetchDiscussions(
     githubPlainResolverFields,
   }
 ) {
-  const context = { discussions: [], cursor: null }
+  const context = { discussions: [], cursor: null };
 
   const getCategoryIdFromSlug = () =>
     typeof categorySlug === "string"
@@ -94,9 +94,9 @@ async function fetchDiscussions(
           categorySlug,
           graphql,
         })
-      : null
+      : null;
 
-  categoryId = categoryId ?? (await getCategoryIdFromSlug())
+  categoryId = categoryId ?? (await getCategoryIdFromSlug());
 
   while (true) {
     const {
@@ -114,28 +114,28 @@ async function fetchDiscussions(
       orderByField,
       graphql,
       githubPlainResolverFields,
-    })
+    });
 
     context.discussions = [
       ...context.discussions,
-      ...discussions.map(d => ({
+      ...discussions.map((d) => ({
         ...d,
-        labels: d.labels.nodes.map(e => e),
+        labels: d.labels.nodes.map((e) => e),
       })),
-    ]
+    ];
 
-    context.cursor = endCursor
+    context.cursor = endCursor;
 
     const reachedLimit =
       typeof resultsLimit === "number" &&
-      context.discussions.length >= resultsLimit
+      context.discussions.length >= resultsLimit;
 
-    if (!hasNextPage || reachedLimit) break
+    if (!hasNextPage || reachedLimit) break;
   }
 
-  return context.discussions
+  return context.discussions;
 }
-exports.fetchDiscussions = fetchDiscussions
+exports.fetchDiscussions = fetchDiscussions;
 
 async function getDiscussionCategoryId(owner, repo, { categorySlug, graphql }) {
   const {
@@ -161,10 +161,10 @@ async function getDiscussionCategoryId(owner, repo, { categorySlug, graphql }) {
       name: repo,
       slug: categorySlug,
     }
-  )
-  return id
+  );
+  return id;
 }
-exports.getDiscussionCategoryId = getDiscussionCategoryId
+exports.getDiscussionCategoryId = getDiscussionCategoryId;
 
 async function getDiscussions(
   owner,
@@ -187,6 +187,6 @@ async function getDiscussions(
     orderByField,
     graphql,
     githubPlainResolverFields,
-  })
+  });
 }
-exports.getDiscussions = getDiscussions
+exports.getDiscussions = getDiscussions;

@@ -1,5 +1,5 @@
 const githubOctokit = require(`./github-octokit`);
-const { mergeDeep } = require(`./utils`);
+const { mergeDeep, removeKey } = require(`./utils`);
 const { getGithubPlainResolverFields } = require(`./plugin-github-fragments`);
 
 const { createRemoteFileNode } = require(`gatsby-source-filesystem`);
@@ -92,7 +92,9 @@ exports.sourceNodes = async (...args) => {
   }
 
   if (typeof pluginOptions?.createCustomMapper === `function`) {
-    const customMapper = pluginOptions.createCustomMapper({ pluginNodeTypes });
+    const customMapper = pluginOptions.createCustomMapper({
+      githubSourcePlugin: { pluginNodeTypes },
+    });
 
     for (const type of Object.values(pluginNodeTypes)) {
       const mapper = customMapper[type];
@@ -171,6 +173,10 @@ exports.onCreateNode = async (...args) => {
 
   const pluginNodeTypes = getPluginNodeTypes(pluginOptions.pluginNodeTypes);
 
+  if (node.internal.type === pluginNodeTypes.USER) {
+    if (!node.login || !node.optimizedAvatar) [console.log({ node })];
+  }
+
   const internalTypes = [...Object.values(pluginNodeTypes)];
 
   const checkIfIsInternalType = (type) => internalTypes.includes(type);
@@ -211,7 +217,7 @@ exports.onCreateNode = async (...args) => {
     const subpluginArgs = [
       { ...args[0], githubSourcePlugin },
       {
-        ...getPluginOptionsWithoutToken(subpluginOptions),
+        ...removeKey(subpluginOptions, `token`),
       },
       ...args.slice(2),
     ];
@@ -223,15 +229,21 @@ exports.onCreateNode = async (...args) => {
 
   // Allow end-users make use of `onCreateNode` APIs.
   if (typeof pluginOptions?.onCreateNode === `function`) {
+    const githubSourcePlugin = {
+      createFileNodeFrom,
+      checkIfIsInternalType,
+      isInternalType,
+      pluginNodeTypes,
+    };
+
     pluginOptions.onCreateNode(
       ...[
-        args[0],
         {
-          ...getPluginOptionsWithoutToken(args[1]),
-          createFileNodeFrom,
-          checkIfIsInternalType,
-          isInternalType,
-          pluginNodeTypes,
+          ...args[0],
+          githubSourcePlugin,
+        },
+        {
+          ...removeKey(args[1], `token`),
         },
         ...args.slice(2),
       ]

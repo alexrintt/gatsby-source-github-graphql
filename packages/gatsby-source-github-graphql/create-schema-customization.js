@@ -35,6 +35,10 @@ module.exports = async (...args) => {
   for (const plugin of plugins) {
     const resolvedPlugin = plugin.module;
 
+    const githubSourcePlugin = {
+      pluginNodeTypes,
+    };
+
     resolvedPlugin?.createSchemaCustomization?.(
       {
         ...args[0],
@@ -48,9 +52,17 @@ module.exports = async (...args) => {
 
   // allow end-users (developers) create schema customizations
   if (typeof pluginOptions.createSchemaCustomization === `function`) {
-    await pluginOptions.createSchemaCustomization(gatsbyNodeApis, {
-      ...pluginOptions,
+    const githubSourcePlugin = {
       pluginNodeTypes,
-    });
+    };
+
+    await pluginOptions.createSchemaCustomization(
+      ...[
+        { ...args[0], githubSourcePlugin },
+        {
+          ...removeKey(pluginOptions, `token`),
+        },
+      ]
+    );
   }
 };

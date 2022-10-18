@@ -13,16 +13,14 @@ module.exports = {
     {
       resolve: `gatsby-source-github-graphql`,
       options: {
-        onCreateNode: async (
-          {
-            node,
-            isInternalType,
-            createContentDigest,
-            createNodeId,
-            actions: { createNode },
-          },
-          { pluginNodeTypes }
-        ) => {
+        onCreateNode: async ({
+          node,
+          isInternalType,
+          createContentDigest,
+          createNodeId,
+          actions: { createNode },
+          githubSourcePlugin: { pluginNodeTypes },
+        }) => {
           if (node.internal.type === pluginNodeTypes.DISCUSSION) {
             const content = node.myOtherFieldAsMarkdown
 
@@ -39,10 +37,10 @@ module.exports = {
             })
           }
         },
-        createSchemaCustomization: (
-          { actions: { createTypes } },
-          { pluginNodeTypes }
-        ) => {
+        createSchemaCustomization: ({
+          actions: { createTypes },
+          githubSourcePlugin: { pluginNodeTypes },
+        }) => {
           const typedefs = `
             type ${pluginNodeTypes.DISCUSSION} implements Node {
               myOtherFieldAsMarkdown: MyCustomMarkdownNodeType @link(from: "id", by: "discussionId")
@@ -50,7 +48,7 @@ module.exports = {
           `
           createTypes(typedefs)
         },
-        createCustomMapper: ({ pluginNodeTypes }) => {
+        createCustomMapper: ({ githubSourcePlugin: { pluginNodeTypes } }) => {
           return {
             [pluginNodeTypes.DISCUSSION]: discussion => {
               return {
@@ -104,6 +102,13 @@ module.exports = {
 
               // [login] user affiliation, same effect if you are logged as user A and is fetching the repositories of the same user A.
               ownerAffiliations: [`OWNER`, `COLLABORATOR`],
+            },
+          },
+          {
+            resolve: `gatsby-source-github-graphql-get-user`,
+            options: {
+              // The option you marked as optional, lets provide it:
+              login: `CarlosZoft`, // Remember to try it without this option to see it working through the provided [token]!
             },
           },
         ],

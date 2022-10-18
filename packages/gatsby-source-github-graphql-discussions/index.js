@@ -10,7 +10,6 @@ async function getRepositoryDiscussions({
   orderByField,
   graphql,
   githubApiTypes,
-  pluginFragments,
   githubPlainResolverFields,
 }) {
   const fetchOnceWithoutFilters = [{}];
@@ -46,7 +45,6 @@ async function getRepositoryDiscussions({
           orderByField,
           ...filter,
           graphql,
-          pluginFragments,
           githubPlainResolverFields,
         })
       )
@@ -87,6 +85,7 @@ module.exports.sourceNodes = async (
   const discussions = await getRepositoryDiscussions({
     ...options,
     graphql,
+    githubApiTypes,
     githubPlainResolverFields,
   });
 
