@@ -121,7 +121,7 @@ module.exports.sourceNodes = async (gatsbyNodeApis, pluginOptions) => {
   // Remember we did not marked as required so it can be null or undefined.
   const { login } = pluginOptions;
 
-  // [githubSourcePlugin] was inserted by the core plugin and here lives all non-official (those provided by Gatsby) APIs.
+  // [githubSourcePlugin] was inserted by the core plugin and here lives all non-official (those provided by the core plugin not Gatsby) APIs.
   const { githubSourcePlugin } = gatsbyNodeApis;
 
   // This [graphql] is from ocktokit/graphql.js package.
