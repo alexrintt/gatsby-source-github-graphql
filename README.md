@@ -16,7 +16,7 @@ module.exports = {
     {
       resolve: `gatsby-source-github-graphql`,
       // Required, GitHub only allow authenticated requests.
-      // Your token is not shared across subplugins unless you specify a custom token to it.
+      // Your token is not shared across subplugins even if you specify a custom token to it.
       token: process.env.GITHUB_TOKEN,
       options: {
         plugins: [
