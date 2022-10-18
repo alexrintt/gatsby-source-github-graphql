@@ -6,6 +6,18 @@
 - It does **NOT** support gif optimizations, [simply because Gatsby does not](https://github.com/gatsbyjs/gatsby/issues/23678).
 - It **PARTIALLY SUPPORTS** the GraphQL Data Layer, if you use-case is not supported yet, feel free to check [how to create a subplugin](#how-to-create-a-subplugin).
 
+## Installation
+
+> **Warning** this is not npm hosted, so be careful if you want to depend on it, I recommend a fork instead a direct dependency.
+
+This package is not published to npm yet, you need to install using [gitpkg](https://gitpkg.now.sh/).
+
+```shell
+npm install https://gitpkg.now.sh/alexrintt/gatsby-source-github-graphql/packages/gatsby-source-github-graphql?master
+# or
+yarn add https://gitpkg.now.sh/alexrintt/gatsby-source-github-graphql/packages/gatsby-source-github-graphql?master
+```
+
 ## Usage
 
 ```js
@@ -16,7 +28,7 @@ module.exports = {
     {
       resolve: `gatsby-source-github-graphql`,
       // Required, GitHub only allow authenticated requests.
-      // Your token is not shared across subplugins unless you specify a custom token to it.
+      // Your token is not shared across subplugins even if you specify a custom token to it.
       token: process.env.GITHUB_TOKEN,
       options: {
         plugins: [
@@ -104,17 +116,8 @@ Most plugins use options to customize their behavior, in our case we need to kno
 4. In this file lets specify which options we're expecting, in our case: the user \[login] which is not required since if it's omitted we will fetch the \[viewer] user (Gatsby uses [Joi](https://joi.dev/api/?v=17.6.1) for schema validation).
 
 ```js
-exports.pluginOptionsSchema = function ({ Joi }) {
-  return Joi.object({
-    login: Joi.string()
-      .description(`The target user account. If omitted the authenticated user will be fetched.`)
-  })
-}
-```
+// plugins/gatsby-source-github-graphql-get-user/index.js
 
-5. Create a file `index.js` with the following contents:
-
-```js
 // Equivalent to [sourceNodes] gatsby API.
 module.exports.sourceNodes = async (gatsbyNodeApis, pluginOptions) => {
   // The [login] option we specified earlier in the [gatsby-node.js] file.
@@ -139,51 +142,149 @@ module.exports.sourceNodes = async (gatsbyNodeApis, pluginOptions) => {
   // Otherwise we will not be able to customize the types if a conflict between plugins node types happens.
   const { pluginNodeTypes } = githubSourcePlugin;
 
-  const { user, repositories } = await graphql(
-    `
-      query GetViewer($login: String!) {
-        user(login: $login) {
-          ${githubPlainResolverFields.USER}
-        }
+  const userQuery = `
+    query GetUser($login: String!) {
+      user(login: $login) {
+        ${githubPlainResolverFields.USER}
       }
-    `,
-    {
-      login: login
     }
-  )
+  `;
+
+  const viewerQuery = `
+    query GetViewer {
+      viewer {
+        ${githubPlainResolverFields.USER}
+      }
+    }
+  `;
+
+  // Wether or not we should fetch a user by its [login] option.
+  const isCustomUser = typeof login === `string`;
+
+  // If there's a custom user, fetch through user query otherwise use the viewer query.
+  const query = isCustomUser ? userQuery : viewerQuery;
+
+  // Same logic for the variables: custom user requires its [login]
+  // But the [viewer] is resolved in the GitHub server through the provided token, so don't need variables.
+  const variables = isCustomUser ? { login: login } : {};
+
+  // You can also add a query alias for [viewer] or [user] query.
+  // But for simplicity lets extract both keys take the not-null one.
+  const { user: customUser, viewer: viewerUser } = await graphql(
+    query,
+    variables
+  );
+  const user = customUser ?? viewerUser;
 
   return {
     // Always define the key as data type and the value as an array of the data.
     [pluginNodeTypes.USER]: [user],
-    [pluginNodeTypes.REPOSITORY]: [...repositories],
   };
-}
+};
 
-module.exports.onCreateNode = ({ node,  }, pluginOptions) => {
-  const { pluginNodeTypes } = pluginOptions;
-  
+// The user avatarURL is optimized by default in the core plugin since it's a intrinsic use-case and it's available under the 'avatarUrlSharpOptimized' key.
+// But just for 'fun' lets create a custom key in the user node type to store a second optimized image URL (just for example purposes).
+module.exports.onCreateNode = async (
+  { node, githubSourcePlugin },
+  pluginOptions
+) => {
+  // [createFileNodeFrom] is new here and it's available only inside of [onCreateNode] function.
+  // This function actually calls [createRemoteFileNode] from [gatsby-source-filesystem] and links to
+  // its parent node, in this case our custom user, it's basically a helper function for image optimization.
+  const { pluginNodeTypes, createFileNodeFrom } = githubSourcePlugin;
+
   if (node.internal.type === pluginNodeTypes.USER) {
     if (`avatarUrl` in node) {
       await createFileNodeFrom({
         node,
+        // Must be the key which stores the actually remote image URL, it's returned by the GitHub API.
         key: `avatarUrl`,
-        // This is also linked on [createSchemaCustomization] step. See the [pluginNodeTypes.USER] type def.
-        fieldName: `optimizedAvatar`,
+        // Important: this [fieldName] defines the key that our image will
+        // be stored inside of the Gatsby reserved [fields] key.
+        fieldName: `optimizedAvatarField`,
       });
-    }    
+    }
   }
-}
+};
 
-module.exports.createSchemaCustomization = ({ actions: { createTypes }, githubSourcePlugin }, pluginOptions) => {
+module.exports.createSchemaCustomization = (
+  { actions: { createTypes }, githubSourcePlugin },
+  pluginOptions
+) => {
   const { pluginNodeTypes } = githubSourcePlugin;
 
+  // Now lets define that the User type will have the key
+  // [optimizedAvatar] that should be linked from the previously created field [optimizedAvatarField].
   const userWithOptimizedAvatarTypeDef = `
     type ${pluginNodeTypes.USER} implements Node {
-      optimizedAvatar: File @link(from: "fields.optimizedAvatar")
+      optimizedAvatar: File @link(from: "fields.optimizedAvatarField")
     }
   `;
-  
+
+  // Now call the API to actually create it.
   createTypes(userWithOptimizedAvatarTypeDef);
+};
+```
+
+5. Create an empty `package.json` with the following contents or just run `npm init -y` or `yarn init -y`:
+
+```js
+{
+  "name": "gatsby-source-github-graphql-get-user",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT"
 }
 ```
 
+6. Almost ready, lets move your working directory to your actual Gatsby project (not the plugins folder).
+  - Remember: when you're using a plugin not from your _plugins/*_ folder you need to install it before (through npm or through directly git installations, see [installation section](#installation) for details).
+
+7. Import your plugin inside the core plugin in your `gatsby-config.js`.
+
+```js
+// gatsby-config.js
+module.exports = {
+  plugins: [
+    {
+      resolve: `gatsby-source-github-graphql`,
+      options: {
+        token: process.env.GITHUB_TOKEN, // Do not forget to provide your token through the .env variable.
+        plugins: [
+          {
+            resolve: `gatsby-source-github-graphql-get-user`,
+            options: {
+              // The option you marked as optional, lets provide it:
+              login: `<your-github-username>` // Remember to try it without this option to see it working through the provided [token]!
+            }
+          }
+        ]
+      }
+    },
+  ]
+};
+```
+
+8. Run `gatsby develop`.
+
+9. Open your browser at `http://localhost:8000/___graphql` (or the URL your configured for Gatsby development server).
+
+10. Run the following query:
+
+```graphql
+query GetMyUser {
+  # Regex because sometimes the username case can differ from the registered in the database.
+  githubUser(login: { regex: "/<your-username-you-defined-at-gatsby-config>/i" }) {
+    login
+    name
+    # The field you created through the plugin!
+    optimizedAvatar
+  }
+}
+```
+
+A prinscreen of what it should looks like:
+
+<img src="https://user-images.githubusercontent.com/51419598/196519795-2041eeb3-5d1b-438a-9012-720a6f71d24c.png">
+
+11. Now keep hacking and use it to build your website/blog.
