@@ -104,6 +104,8 @@ Most plugins use options to customize their behavior, in our case we need to kno
 4. In this file lets specify which options we're expecting, in our case: the user \[login] which is not required since if it's omitted we will fetch the \[viewer] user (Gatsby uses [Joi](https://joi.dev/api/?v=17.6.1) for schema validation).
 
 ```js
+// plugins/gatsby-source-github-graphql-get-user/gatsby-node.js
+
 exports.pluginOptionsSchema = function ({ Joi }) {
   return Joi.object({
     login: Joi.string()
@@ -115,6 +117,8 @@ exports.pluginOptionsSchema = function ({ Joi }) {
 5. Create a file `index.js` with the following contents:
 
 ```js
+// plugins/gatsby-source-github-graphql-get-user/index.js
+
 // Equivalent to [sourceNodes] gatsby API.
 module.exports.sourceNodes = async (gatsbyNodeApis, pluginOptions) => {
   // The [login] option we specified earlier in the [gatsby-node.js] file.
