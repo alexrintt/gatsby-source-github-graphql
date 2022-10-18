@@ -6,6 +6,10 @@
 - It does **NOT** support gif optimizations, [simply because Gatsby does not](https://github.com/gatsbyjs/gatsby/issues/23678).
 - It **PARTIALLY SUPPORTS** the GraphQL Data Layer, if you use-case is not supported yet, feel free to check [how to create a subplugin](#how-to-create-a-subplugin).
 
+## Installation
+
+...
+
 ## Usage
 
 ```js
@@ -104,20 +108,6 @@ Most plugins use options to customize their behavior, in our case we need to kno
 4. In this file lets specify which options we're expecting, in our case: the user \[login] which is not required since if it's omitted we will fetch the \[viewer] user (Gatsby uses [Joi](https://joi.dev/api/?v=17.6.1) for schema validation).
 
 ```js
-// plugins/gatsby-source-github-graphql-get-user/gatsby-node.js
-
-exports.pluginOptionsSchema = function ({ Joi }) {
-  return Joi.object({
-    login: Joi.string().description(
-      `The target user account. If omitted the authenticated user will be fetched.`
-    ),
-  });
-};
-```
-
-5. Create a file `index.js` with the following contents:
-
-```js
 // plugins/gatsby-source-github-graphql-get-user/index.js
 
 // Equivalent to [sourceNodes] gatsby API.
@@ -164,7 +154,7 @@ module.exports.sourceNodes = async (gatsbyNodeApis, pluginOptions) => {
   const isCustomUser = typeof login === `string`;
 
   // If there's a custom user, fetch through user query otherwise use the viewer query.
-  const query = isCustomUser ? getUserQuery : viewerQuery;
+  const query = isCustomUser ? userQuery : viewerQuery;
 
   // Same logic for the variables: custom user requires its [login]
   // But the [viewer] is resolved in the GitHub server through the provided token, so don't need variables.
@@ -233,13 +223,14 @@ module.exports.createSchemaCustomization = (
 ```js
 {
   "name": "gatsby-source-github-graphql-get-user",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "index.js",
   "license": "MIT"
 }
 ```
 
 6. Almost ready, lets move your working directory to your actual Gatsby project (not the plugins folder).
+  - Remember: when you're using a plugin not from your _plugins/*_ folder you need to install it before (through npm or through directly git installations, see [installation section](#installation) for details).
 
 7. Import your plugin inside the core plugin in your `gatsby-config.js`.
 
@@ -268,4 +259,24 @@ module.exports = {
 
 8. Run `gatsby develop`.
 
-9. ...
+9. Open your browser at `http://localhost:8000/___graphql` (or the URL your configured for Gatsby development server).
+
+10. Run the following query:
+
+```graphql
+query GetMyUser {
+  # Regex because sometimes the username case can differ from the registered in the database.
+  githubUser(login: { regex: "/<your-username-you-defined-at-gatsby-config>/i" }) {
+    login
+    name
+    # The field you created through the plugin!
+    optimizedAvatar
+  }
+}
+```
+
+A prinscreen of what it should looks like:
+
+<img src="https://user-images.githubusercontent.com/51419598/196519795-2041eeb3-5d1b-438a-9012-720a6f71d24c.png">
+
+11. Now keep hacking and use it to build your website/blog.
