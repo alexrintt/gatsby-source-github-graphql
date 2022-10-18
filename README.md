@@ -172,18 +172,24 @@ module.exports.sourceNodes = async (gatsbyNodeApis, pluginOptions) => {
 
   // You can also add a query alias for [viewer] or [user] query.
   // But for simplicity lets extract both keys take the not-null one.
-  const { user: customUser, viewer: viewerUser } = await graphql(query, variables);
+  const { user: customUser, viewer: viewerUser } = await graphql(
+    query,
+    variables
+  );
   const user = customUser ?? viewerUser;
 
   return {
     // Always define the key as data type and the value as an array of the data.
     [pluginNodeTypes.USER]: [user],
   };
-}
+};
 
 // The user avatarURL is optimized by default in the core plugin since it's a intrinsic use-case and it's available under the 'avatarUrlSharpOptimized' key.
 // But just for 'fun' lets create a custom key in the user node type to store a second optimized image URL (just for example purposes).
-module.exports.onCreateNode = ({ node, githubSourcePlugin }, pluginOptions) => {
+module.exports.onCreateNode = async (
+  { node, githubSourcePlugin },
+  pluginOptions
+) => {
   // [createFileNodeFrom] is new here and it's available only inside of [onCreateNode] function.
   // This function actually calls [createRemoteFileNode] from [gatsby-source-filesystem] and links to
   // its parent node, in this case our custom user, it's basically a helper function for image optimization.
@@ -197,16 +203,19 @@ module.exports.onCreateNode = ({ node, githubSourcePlugin }, pluginOptions) => {
         key: `avatarUrl`,
         // Important: this [fieldName] defines the key that our image will
         // be stored inside of the Gatsby reserved [fields] key.
-        fieldName: `optimizedAvatarField`
+        fieldName: `optimizedAvatarField`,
       });
-    }    
+    }
   }
-}
+};
 
-module.exports.createSchemaCustomization = ({ actions: { createTypes }, githubSourcePlugin }, pluginOptions) => {
+module.exports.createSchemaCustomization = (
+  { actions: { createTypes }, githubSourcePlugin },
+  pluginOptions
+) => {
   const { pluginNodeTypes } = githubSourcePlugin;
 
-  // Now lets define that the User type will have the key 
+  // Now lets define that the User type will have the key
   // [optimizedAvatar] that should be linked from the previously created field [optimizedAvatarField].
   const userWithOptimizedAvatarTypeDef = `
     type ${pluginNodeTypes.USER} implements Node {
@@ -216,7 +225,7 @@ module.exports.createSchemaCustomization = ({ actions: { createTypes }, githubSo
 
   // Now call the API to actually create it.
   createTypes(userWithOptimizedAvatarTypeDef);
-}
+};
 ```
 
 5. Create an empty `package.json` with the following contents or just run `npm init -y` or `yarn init -y`:
