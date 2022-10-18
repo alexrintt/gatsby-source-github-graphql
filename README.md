@@ -8,7 +8,13 @@
 
 ## Installation
 
-...
+This package is not published to npm yet, you need to install using [gitpkg](https://gitpkg.now.sh/).
+
+```shell
+npm install https://gitpkg.now.sh/alexrintt/gatsby-source-github-graphql/packages/gatsby-source-github-graphql?master
+# or
+yarn add https://gitpkg.now.sh/alexrintt/gatsby-source-github-graphql/packages/gatsby-source-github-graphql?master
+```
 
 ## Usage
 
