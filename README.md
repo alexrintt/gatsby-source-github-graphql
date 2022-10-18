@@ -139,36 +139,60 @@ module.exports.sourceNodes = async (gatsbyNodeApis, pluginOptions) => {
   // Otherwise we will not be able to customize the types if a conflict between plugins node types happens.
   const { pluginNodeTypes } = githubSourcePlugin;
 
-  const { user, repositories } = await graphql(
-    `
-      query GetViewer($login: String!) {
-        user(login: $login) {
-          ${githubPlainResolverFields.USER}
-        }
+  const userQuery = `
+    query GetUser($login: String!) {
+      user(login: $login) {
+        ${githubPlainResolverFields.USER}
       }
-    `,
-    {
-      login: login
     }
-  )
+  `;
+
+  const viewerQuery = `
+    query GetViewer {
+      viewer {
+        ${githubPlainResolverFields.USER}
+      }
+    }
+  `;
+
+  // Wether or not we should fetch a user by its [login] option.
+  const isCustomUser = typeof login === `string`;
+
+  // If there's a custom user, fetch through user query otherwise use the viewer query.
+  const query = isCustomUser ? getUserQuery : viewerQuery;
+
+  // Same logic for the variables: custom user requires its [login]
+  // But the [viewer] is resolved in the GitHub server through the provided token, so don't need variables.
+  const variables = isCustomUser ? { login: login } : {};
+
+  // You can also add a query alias for [viewer] or [user] query.
+  // But for simplicity lets extract both keys take the not-null one.
+  const { user: customUser, viewer: viewerUser } = await graphql(query, variables);
+  const user = customUser ?? viewerUser;
 
   return {
     // Always define the key as data type and the value as an array of the data.
     [pluginNodeTypes.USER]: [user],
-    [pluginNodeTypes.REPOSITORY]: [...repositories],
   };
 }
 
-module.exports.onCreateNode = ({ node,  }, pluginOptions) => {
-  const { pluginNodeTypes } = pluginOptions;
-  
+// The user avatarURL is optimized by default in the core plugin since it's a intrinc use-case and it's available under the 'avatarUrlSharpOptimized' key.
+// But just for 'fun' lets create a custom key in the user node type to store a second optimized image URL (just for example purposes).
+module.exports.onCreateNode = ({ node, githubSourcePlugin }, pluginOptions) => {
+  // [createFileNodeFrom] is new here and it's available only inside of [onCreateNode] function.
+  // This function actually calls [createRemoteFileNode] from [gatsby-source-filesystem] and links to
+  // its parent node, in this case our custom user, it's basically a helper function for image optimization.
+  const { pluginNodeTypes, createFileNodeFrom } = githubSourcePlugin;
+
   if (node.internal.type === pluginNodeTypes.USER) {
     if (`avatarUrl` in node) {
       await createFileNodeFrom({
         node,
+        // Must be the key which stores the actually remote image URL, it's returned by the GitHub API.
         key: `avatarUrl`,
-        // This is also linked on [createSchemaCustomization] step. See the [pluginNodeTypes.USER] type def.
-        fieldName: `optimizedAvatar`,
+        // Important: this [fieldName] defines the key that our image will
+        // be stored inside of the Gatsby reserved [fields] key.
+        fieldName: `optimizedAvatarField`
       });
     }    
   }
@@ -177,13 +201,57 @@ module.exports.onCreateNode = ({ node,  }, pluginOptions) => {
 module.exports.createSchemaCustomization = ({ actions: { createTypes }, githubSourcePlugin }, pluginOptions) => {
   const { pluginNodeTypes } = githubSourcePlugin;
 
+  // Now lets define that the User type will have the key 
+  // [myOptimizedAvatar] that should be linked from the previously created [field] 'optimizedAvatarField'.
   const userWithOptimizedAvatarTypeDef = `
     type ${pluginNodeTypes.USER} implements Node {
-      optimizedAvatar: File @link(from: "fields.optimizedAvatar")
+      optimizedAvatar: File @link(from: "fields.optimizedAvatarField")
     }
   `;
-  
+
+  // Now call the API to actually create it.
   createTypes(userWithOptimizedAvatarTypeDef);
 }
 ```
 
+5. Create an empty `package.json` with the following contents or just run `npm init -y` or `yarn init -y`:
+
+```js
+{
+  "name": "gatsby-source-github-graphql-get-user",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT"
+}
+```
+
+6. Almost ready, lets move your working directory to your actual Gatsby project (not the plugins folder).
+
+7. Import your plugin inside the core plugin in your `gatsby-config.js`.
+
+```js
+// gatsby-config.js
+module.exports = {
+  plugins: [
+    {
+      resolve: `gatsby-source-github-graphql`,
+      options: {
+        token: process.env.GITHUB_TOKEN, // Do not forget to provide your token through the .env variable.
+        plugins: [
+          {
+            resolve: `gatsby-source-github-graphql-get-user`,
+            options: {
+              // The option you marked as optional, lets provide it:
+              login: `<your-github-username>` // Remember to try it without this option to see it working through the provided [token]!
+            }
+          }
+        ]
+      }
+    },
+  ]
+};
+```
+
+8. Run `gatsby develop`.
+
+9. ...
