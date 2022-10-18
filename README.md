@@ -108,10 +108,11 @@ Most plugins use options to customize their behavior, in our case we need to kno
 
 exports.pluginOptionsSchema = function ({ Joi }) {
   return Joi.object({
-    login: Joi.string()
-      .description(`The target user account. If omitted the authenticated user will be fetched.`)
-  })
-}
+    login: Joi.string().description(
+      `The target user account. If omitted the authenticated user will be fetched.`
+    ),
+  });
+};
 ```
 
 5. Create a file `index.js` with the following contents:
