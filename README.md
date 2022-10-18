@@ -49,7 +49,141 @@ But as always, do you have an idea or recommendation? just push it into the issu
 - It does **NOT** support gif optimizations, [simply because Gatsby does not](https://github.com/gatsbyjs/gatsby/issues/23678).
 - It **PARTIALLY SUPPORT** support the GraphQL data layer, if you use-case is not supported yet, feel free to check [how to create a subplugin](#how-to-create-a-subplugin).
 
+## Usage
+
+```js
+// gatsby-node.js
+module.exports = {
+  // ...
+  plugins: [
+    {
+      resolve: `gatsby-source-github-graphql`,
+
+      // Required, GitHub only allow authenticated requests.
+      // Your token is not shared across subplugins unless you specify a custom token to it.
+      token: process.env.GITHUB_TOKEN,
+      options: {
+        plugins: [
+          {
+            resolve: `gatsby-source-github-graphql-discussions`,
+            options: {
+              owner: `<your-target-username>`,
+              repo: `<your-target-user-repo>`
+            },
+          },
+          {
+            // You can duplicate the plugins to fetch data from multiple times from different sources.
+            resolve: `gatsby-source-github-graphql-discussions`,
+            options: {
+              owner: `<your-another-target-username>`,
+              repo: `<another-target-user-repo>`,
+              // Optional, only if you want to override the token previously defined for this plugin instance in particular.
+              token: process.env.SOME_ANOTHER_GITHUB_TOKEN
+            },
+          }
+        ]
+      }
+    } 
+  ]
+}
+```
+
 ## How to create a subplugin 
 
-...
+Lets learn by example, the following section will create a subplugin which will fetch the \[viewer] or a given user from his \[login] and add it to the Gatsby GraphQL Data Layer.
+
+### Defining your plugin options
+
+Most plugins use options to customize their behavior, in our case we need to know the login, even though not required.
+
+1. In your Gatsby project, create the plugin folder _plugins/gatsby-source-github-graphql-get-user_.
+
+2. From now, we'll be working inside this folder.
+
+3. Create a file called `gatsby-node.js`.
+
+4. In this file lets specify which options we're expecting, in our case: the user \[login] which is not required since if it's omitted we will fetch the \[viewer] user (Gatsby uses [Joi](https://joi.dev/api/?v=17.6.1) for schema validation).
+
+```js
+exports.pluginOptionsSchema = function ({ Joi }) {
+  return Joi.object({
+    login: Joi.string()
+      .description(`The target user account. If omitted the authenticated user will be fetched.`)
+  })
+}
+```
+
+5. Create a file `index.js` with the following contents:
+
+```js
+// Equivalent to [sourceNodes] gatsby API.
+module.exports.sourceNodes = async (gatsbyNodeApis, pluginOptions) => {
+  // Now the user must specify this on
+  const { login } = pluginOptions;
+
+  // [githubSourcePlugin] was inserted by the core plugin and here lives all non-official (those provided by Gatsby) APIs.
+  const { githubSourcePlugin } = gatsbyNodeApis;
+
+  // This [graphql] is from ocktokit/graphql.js package.
+  // Even though is not possible to access the token itself directly,
+  // you can make authenticated requests using this graphql client.
+  // The authenticated user is defined in the [pluginOptions.token] or [yourSubpluginOptions.token].
+  const { graphql } = githubSourcePlugin;
+
+  // Did not found an way to share fragments across subplugins to avoid repetition and lack of data so I did raw strings.
+  // This is safe to insert in the query since it is package defined and has no user input.
+  // You can use it or not. If you think it's not required (e.g you are fetching repositories of a user, you don't care about the user data itself) then just skip it for the user resolver.
+  const { githubPlainResolverFields } = githubSourcePlugin;
+
+  // Always use this variable to define types.
+  // Otherwise we will not be able to customize the types if a conflict between plugins node types happens.
+  const { pluginNodeTypes } = githubSourcePlugin;
+
+  const { user, repositories } = await graphql(
+    `
+      query GetViewer($login: String!) {
+        user(login: $login) {
+          ${githubPlainResolverFields.USER}
+        }
+      }
+    `,
+    {
+      login: login
+    }
+  )
+
+  return {
+    // Always define the key as data type and the value as an array of the data.
+    [pluginNodeTypes.USER]: [user],
+    [pluginNodeTypes.REPOSITORY]: [...repositories],
+  };
+}
+
+module.exports.onCreateNode = ({ node,  }, pluginOptions) => {
+  const { pluginNodeTypes } = pluginOptions;
+  
+  if (node.internal.type === pluginNodeTypes.USER) {
+    if (`avatarUrl` in node) {
+      await createFileNodeFrom({
+        node,
+        key: `avatarUrl`,
+        // This is also linked on [createSchemaCustomization] step. See the [pluginNodeTypes.USER] type def.
+        fieldName: `optimizedAvatar`,
+      });
+    }    
+  }
+}
+
+module.exports.createSchemaCustomization = ({ actions: { createTypes }, githubSourcePlugin }, pluginOptions) => {
+  const { pluginNodeTypes } = githubSourcePlugin;
+
+  const userWithOptimizedAvatarTypeDef = `
+    type ${pluginNodeTypes.USER} implements Node {
+      optimizedAvatar: File @link(from: "fields.optimizedAvatar")
+    }
+  `;
+  
+  createTypes(userWithOptimizedAvatarTypeDef);
+}
+```
 
