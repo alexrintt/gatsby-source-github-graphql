@@ -61,7 +61,7 @@ Because I'm building my blog that will be soon available at [alexrintt.com](http
   2. I want to apply any of Gatsby optimization and transformer plugins to any of the GitHub resource types (e.g repo, user, issue, discussion, file, etc.): is it a repository? optimize it's open graph image url; is it a user? optimize it's avatar url; is it a markdown file? mark it's contents as markdown media type to optimize using MarkdownRemark.
   3. From the previous point I also wanted to make it easy to extend and easy to replace, so I'll be able to extend when a use-case is missing but I'll also be able to replace in case of my use-case is different, e.g: if I've a plugin that optimize all GitHub issues as markdown files but instead I want to optimize as AsciiDoc files (or any custom processing), what should I do?
 - Supports image optimization, bandwidth bla-bla - this is also important but lets talk about this motherf [web.dev/optimize-cls](https://web.dev/optimize-cls/).
-- Markdown compatible (or any other markup), at this moment I'm using markdown of a repository discussions to build a blog, but what if I want to switch in the future, or maybe change the processing rule or package?
+- Markdown compatible (or any other markup), at this moment I'm using the discussions of a repository as markdown files to build a blog, but what if I want to switch in the future, or maybe change the processing rule or package?
 
 ### What I've tried before:
 
