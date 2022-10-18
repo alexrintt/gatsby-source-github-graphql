@@ -297,7 +297,7 @@ A prinscreen of what it should looks like:
 <p align="center">
   <sub>Copyright © 2022-present, Alex Rintt.</sub>
 </p>
-<p align="center">Gatsby Soource GitHub GraphQL <a href="/LICENSE">is MIT licensed 💖</a></p>
+<p align="center">Gatsby Source GitHub GraphQL <a href="/LICENSE">is MIT licensed 💖</a></p>
 <p align="center">
   <img src="https://user-images.githubusercontent.com/51419598/194058464-f67c7fb5-9066-49b5-aa94-cf34830708ad.png" width="35" />
 </p>
