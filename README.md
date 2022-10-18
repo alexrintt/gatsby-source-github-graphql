@@ -8,6 +8,8 @@
 
 ## Installation
 
+> **Warning** this is not npm hosted, so be careful if you want to depend on it, I recommend a fork instead a direct dependency.
+
 This package is not published to npm yet, you need to install using [gitpkg](https://gitpkg.now.sh/).
 
 ```shell
