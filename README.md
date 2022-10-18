@@ -288,3 +288,18 @@ A prinscreen of what it should looks like:
 <img src="https://user-images.githubusercontent.com/51419598/196519795-2041eeb3-5d1b-438a-9012-720a6f71d24c.png">
 
 11. Now keep hacking and use it to build your website/blog.
+
+<samp>
+
+<h2 align="center">
+  Open Source
+</h2>
+<p align="center">
+  <sub>Copyright © 2022-present, Alex Rintt.</sub>
+</p>
+<p align="center">Gatsby Soource GitHub GraphQL <a href="/LICENSE">is MIT licensed 💖</a></p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/51419598/194058464-f67c7fb5-9066-49b5-aa94-cf34830708ad.png" width="35" />
+</p>
+
+</samp>
