@@ -3,9 +3,9 @@
 To install this package just run:
 
 ```shell
-npm install https://gitpkg.now.sh/<alexrintt/gatsby-source-github-graphql/packages/gatsby-source-github-graphql-discussions?master
+npm install https://gitpkg.now.sh/alexrintt/gatsby-source-github-graphql/packages/gatsby-source-github-graphql-discussions?master
 # or
-yarn add https://gitpkg.now.sh/<alexrintt/gatsby-source-github-graphql/packages/gatsby-source-github-graphql-discussions?master
+yarn add https://gitpkg.now.sh/alexrintt/gatsby-source-github-graphql/packages/gatsby-source-github-graphql-discussions?master
 ```
 
 ## Usage
