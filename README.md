@@ -5,7 +5,7 @@ I was searching for a plugin that fill these requirements:
 - Fetch data from GitHub GraphQL API.
 - Supports Gatsby GraphQL Data Layer.
 - Supports image optimization.
-- Markdown compatible (or any other markup) support.
+- Markdown compatible (or any other markup).
 
 ### Why do I need it:
 
