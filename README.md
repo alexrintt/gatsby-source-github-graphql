@@ -1,8 +1,6 @@
 ## Why does it exists
 
-Because I was building my blog that is currently at [alexrintt.com](https://alexrintt.com).
-
-I was searching for a plugin that fill these requirements:
+Because I'm building my blog that will be soon available at [alexrintt.com](https://alexrintt.com) and was searching for a plugin that fill these requirements:
 
 - Fetch data from GitHub GraphQL API.
 - Supports Gatsby GraphQL Data Layer.
