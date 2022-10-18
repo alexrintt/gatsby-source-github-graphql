@@ -117,14 +117,15 @@ exports.pluginOptionsSchema = function ({ Joi }) {
 ```js
 // Equivalent to [sourceNodes] gatsby API.
 module.exports.sourceNodes = async (gatsbyNodeApis, pluginOptions) => {
-  // Now the user must specify this on
+  // The [login] option we specified earlier in the [gatsby-node.js] file.
+  // Remember we did not marked as required so it can be null or undefined.
   const { login } = pluginOptions;
 
   // [githubSourcePlugin] was inserted by the core plugin and here lives all non-official (those provided by Gatsby) APIs.
   const { githubSourcePlugin } = gatsbyNodeApis;
 
   // This [graphql] is from ocktokit/graphql.js package.
-  // Even though is not possible to access the token itself directly,
+  // Even though is not possible to access the token directly,
   // you can make authenticated requests using this graphql client.
   // The authenticated user is defined in the [pluginOptions.token] or [yourSubpluginOptions.token].
   const { graphql } = githubSourcePlugin;
