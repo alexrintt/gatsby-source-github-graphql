@@ -58,7 +58,7 @@ module.exports = {
 
 ## Why does it exists
 
-Because I'm building my blog that will be soon available at [alexrintt.com](https://alexrintt.com) and was searching for a plugin that fill these requirements:
+Because I'm building my blog that will be soon available at [alexrintt.io](https://alexrintt.io) and was searching for a plugin that fill these requirements:
 
 - Fetch data from GitHub GraphQL API.
 - Supports Gatsby GraphQL Data Layer.
