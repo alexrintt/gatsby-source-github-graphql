@@ -173,10 +173,6 @@ exports.onCreateNode = async (...args) => {
 
   const pluginNodeTypes = getPluginNodeTypes(pluginOptions.pluginNodeTypes);
 
-  if (node.internal.type === pluginNodeTypes.USER) {
-    if (!node.login || !node.optimizedAvatar) [console.log({ node })];
-  }
-
   const internalTypes = [...Object.values(pluginNodeTypes)];
 
   const checkIfIsInternalType = (type) => internalTypes.includes(type);
