@@ -69,7 +69,7 @@ Because I'm building my blog that will be soon available at [alexrintt.com](http
 
 - Fetch data from GitHub, well - this is my data source.
 - Supports Gatsby GraphQL Data Layer, this is the hard one which I kept in my requirements list for some reasons:
-  1. I want to make total use of Gatsby GraphQL Data Layer (as we already have in CMS specific plugins like [gatsbyjs/gatsby/packages/gatsby-source-contentful](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-source-contentful) or [TryGhost/gatsby-source-ghost](https://github.com/TryGhost/gatsby-source-ghost/).
+  1. I want to make total use of Gatsby GraphQL Data Layer (as we already have in CMS specific plugins like [gatsbyjs/gatsby/packages/gatsby-source-contentful](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-source-contentful) or [TryGhost/gatsby-source-ghost](https://github.com/TryGhost/gatsby-source-ghost/)).
   2. I want to apply any of Gatsby optimization and transformer plugins to any of the GitHub resource types (e.g repo, user, issue, discussion, file, etc.): is it a repository? optimize it's open graph image url; is it a user? optimize it's avatar url; is it a markdown file? mark it's contents as markdown media type to optimize using MarkdownRemark.
   3. From the previous point I also wanted to make it easy to extend and easy to replace, so I'll be able to extend when a use-case is missing but I'll also be able to replace in case of my use-case is different, e.g: if I've a plugin that optimize all GitHub issues as markdown files but instead I want to optimize as AsciiDoc files (or any custom processing), what should I do?
 - Supports image optimization, bandwidth bla-bla - this is also important but lets talk about this motherf [web.dev/optimize-cls](https://web.dev/optimize-cls/).
@@ -288,3 +288,18 @@ A prinscreen of what it should looks like:
 <img src="https://user-images.githubusercontent.com/51419598/196519795-2041eeb3-5d1b-438a-9012-720a6f71d24c.png">
 
 11. Now keep hacking and use it to build your website/blog.
+
+<samp>
+
+<h2 align="center">
+  Open Source
+</h2>
+<p align="center">
+  <sub>Copyright © 2022-present, Alex Rintt.</sub>
+</p>
+<p align="center">Gatsby Source GitHub GraphQL <a href="/LICENSE">is MIT licensed 💖</a></p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/51419598/194058464-f67c7fb5-9066-49b5-aa94-cf34830708ad.png" width="35" />
+</p>
+
+</samp>
