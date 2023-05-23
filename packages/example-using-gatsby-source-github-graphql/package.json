@@ -1,0 +1,51 @@
+{
+  "name": "example-using-gatsby-source-github-graphql",
+  "private": true,
+  "description": "Example app using the Gatsby GitHub GraphQL Source plugin.",
+  "version": "0.1.0",
+  "author": "Alex Rintt <alexrintt@gmail.com>",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "gatsby": "^4.24.3",
+    "gatsby-plugin-image": "^2.24.0",
+    "gatsby-plugin-manifest": "^4.24.0",
+    "gatsby-plugin-sharp": "^4.24.0",
+    "gatsby-remark-images-remote": "^2.1.1",
+    "gatsby-source-filesystem": "^4.24.0",
+    "gatsby-transformer-remark": "^5.24.0",
+    "gatsby-transformer-sharp": "^4.24.0",
+    "prop-types": "^15.8.1",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "gatsby-source-github-graphql": "*",
+    "gatsby-source-github-graphql-discussions": "*",
+    "gatsby-source-github-graphql-sponsors": "*",
+    "gatsby-source-github-graphql-user-repos": "*",
+    "gatsby-source-github-graphql-get-user": "*"
+  },
+  "devDependencies": {
+    "prettier": "^2.7.1"
+  },
+  "keywords": [
+    "gatsby"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "postinstall": "lerna bootstrap",
+    "build": "npm run clean && gatsby build",
+    "develop": "npm run clean && gatsby develop",
+    "dev": "npm run clean && gatsby develop",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\"",
+    "start": "npm run clean && gatsby develop",
+    "serve": "npm run clean && gatsby serve",
+    "clean": "gatsby clean",
+    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
+  },
+  "bugs": {
+    "url": "https://github.com/gatsbyjs/gatsby/issues"
+  }
+}
